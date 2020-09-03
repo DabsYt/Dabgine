@@ -141,9 +141,11 @@
   <ItemGroup>
     <ClCompile Include="core\Engine.cpp" />
     <ClCompile Include="core\main.cpp" />
+    <ClCompile Include="core\utils\Logging.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="core\Engine.h" />
+    <ClInclude Include="core\Engine.hpp" />
+    <ClInclude Include="core\utils\Logging.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

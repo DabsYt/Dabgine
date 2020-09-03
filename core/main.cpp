@@ -3,7 +3,7 @@
 */
 
 // Self-made headers
-#include "Engine.h"
+#include "Engine.hpp"
 
 // 3rd-party headers
 // none needed in main
