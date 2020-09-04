@@ -10,7 +10,7 @@ private:
 	// Variables
 
 	bool debugMode = true; // disable / enable outputting logs and more
-	int minLevel = -1; // -1 to 2 where 2 = no logs and -1 = show all logs
+	int minLevel = -1; // -1 to 2 where 2 = no logs and -1 = show all logs 
 
 	// Functions
 
@@ -22,7 +22,7 @@ public:
 	// \brief Logs a message to the console.		
 	//
 	// @param logText: The log text.
-	// @param logLevel: The log level.
+	// @param logLevel: The log level[0=info|1=warn|2=err]
 	/////////////////////////////////////////////////////////
 	void log(std::string logText, int logLevel = 0);
 

@@ -26,7 +26,6 @@ int WinMain() {
 }
 
 int main() {
-
 	sf::ContextSettings ctx = sf::ContextSettings();
 	ctx.majorVersion = 2;
 	ctx.minorVersion = 0; // opengl 2

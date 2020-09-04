@@ -19,12 +19,32 @@ private:
 	sf::RenderWindow* rw;
 	tgui::Gui gui;
 	sf::Event ev;
+
+	// Default constructor params
 	sf::VideoMode w_def_vm = sf::VideoMode(600, 400);
 	std::string w_def_title = "Default Title";
-	sf::Color w_def_color = sf::Color::Black;
-	int w_def_fps = 60;
+	unsigned int w_def_fps = 60;
+
+	// General variables
+	sf::Color w_render_color = sf::Color::Black;
+	bool hasStarted = false; // check in render etc if window is ready
+	
+	// Custom window variables
+	bool isCustomWindow = false; // needed for resizing correctly
+	sf::VideoMode w_cm_vm;
+	std::string w_cm_title;
+	sf::Uint32 w_cm_style;
+	sf::ContextSettings w_cm_ctx;
+	unsigned int w_cm_fps;
+
+	// Other
 
 	// Functions
+
+	/////////////////////////////////////////////////////////
+	// \brief Run only once, at startup.
+	/////////////////////////////////////////////////////////
+	void initOnce();
 
 public:
 
@@ -35,7 +55,7 @@ public:
 	/////////////////////////////////////////////////////////
 	Engine();
 
-	Engine(sf::VideoMode, std::string, sf::Uint32 = sf::Style::Default,const sf::ContextSettings = sf::ContextSettings(), sf::Color = sf::Color::Black, int = 60);
+	Engine(sf::VideoMode w_vm, std::string w_title, sf::Uint32 w_style = sf::Style::Default,const sf::ContextSettings w_ctx = sf::ContextSettings(), sf::Color w_col= sf::Color::Black, int fps = 60);
 
 	/////////////////////////////////////////////////////////
 	// \brief The engine destructor.
@@ -43,7 +63,12 @@ public:
 	virtual ~Engine();
 
 	// Functions
-	
+
+	/////////////////////////////////////////////////////////
+	// \brief Resizes the current window.
+	/////////////////////////////////////////////////////////
+	void resize(sf::VideoMode w_vm);
+
 	/////////////////////////////////////////////////////////
 	// \brief Polls all current events such as input.
 	/////////////////////////////////////////////////////////
@@ -66,5 +91,20 @@ public:
 	// @return const bool: The window's state.
 	/////////////////////////////////////////////////////////
 	const bool running();
+
+	/////////////////////////////////////////////////////////
+	// \brief Changes the current render color.
+	//
+	// @param newColor: The new render color.
+	/////////////////////////////////////////////////////////
+	void setRenderColor(sf::Color newColor);
+
+	/////////////////////////////////////////////////////////
+	// \brief Gets the current render color.
+	//
+	// @return sf::Color: The current render color.
+	/////////////////////////////////////////////////////////
+	sf::Color getRenderColor();
+
 };
 #endif
