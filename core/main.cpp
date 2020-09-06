@@ -11,29 +11,28 @@
 // Compiler headers
 // none needed also
 
-int WinMain() {
-
+/////////////////////////////////////////////////////////
+// \brief Shared startup func to minimise repetition.
+/////////////////////////////////////////////////////////
+void startup() {
 	sf::ContextSettings ctx = sf::ContextSettings();
 	ctx.majorVersion = 2;
 	ctx.minorVersion = 0; // opengl 2
-	Engine engine(sf::VideoMode(800, 600), "Dabgine", sf::Style::Titlebar | sf::Style::Close, ctx, sf::Color::Blue, 60);
+	Engine engine(sf::VideoMode(800, 600), "Dabgine", sf::Style::Titlebar | sf::Style::Close, ctx, sf::Color::Black, 60);
+}
 
-	while (engine.running()) {
-		engine.render();
-	}
+// Entry function for RELEASE config.
+int WinMain() {
+
+	startup();
 
 	return 0;
 }
 
+// Entry function for DEBUG config, used to open the console for debugging purposes rather than just a window, like RELEASE does.
 int main() {
-	sf::ContextSettings ctx = sf::ContextSettings();
-	ctx.majorVersion = 2;
-	ctx.minorVersion = 0; // opengl 2
-	Engine engine(sf::VideoMode(800, 600), "Dabgine", sf::Style::Titlebar | sf::Style::Close, ctx, sf::Color::Blue, 60);
-
-	while (engine.running()) {
-		engine.render();
-	}
+	
+	startup();
 
 	return 0;
 }

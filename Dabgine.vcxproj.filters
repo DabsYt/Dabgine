@@ -33,4 +33,7 @@
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="core\Fonts\Alata-Regular.ttf" />
+  </ItemGroup>
 </Project>
