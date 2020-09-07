@@ -11,8 +11,16 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Window.hpp"
 #include "TGUI/TGUI.hpp"
+#include "nlohmann\json.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <experimental/filesystem>
+#include <algorithm>
+
+using json = nlohmann::json;
+
+namespace fs = std::experimental::filesystem;
 
 
 ///// |----- HEADERS -----| /////
@@ -52,6 +60,7 @@ private:
 	sf::Color w_render_color = sf::Color::Black;
 	bool hasStarted = false; // check in render etc if window is ready
 	int max_scenes = 2; // needed for changeScene
+	std::string proj_file_path = "projects.json";
 
 	// CUSTOM WINDOW VARIABLES //
 
@@ -190,6 +199,11 @@ public:
 	// @param which: The scene's int number.
 	/////////////////////////////////////////////////////////
 	void changeScene(int which);
+
+	/////////////////////////////////////////////////////////
+	// \brief Checks all the necessary files.
+	/////////////////////////////////////////////////////////
+	void checkCoreFiles();
 
 
 	///// |----- FUNCTIONS -----| /////

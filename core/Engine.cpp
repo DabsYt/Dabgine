@@ -6,13 +6,20 @@
 
 void Engine::initOnce() {
 	log.log("Dabgine starting...");
+	
+	// Check stuff first here (files, projects, settings etc.)
+	checkCoreFiles();
+
+	// Other
 	gui.setTarget(*rw);
 	gui.setTabKeyUsageEnabled(false); // baaad tab keys
-	gui.unfocusAllWidgets(); // maybe to prevent editbox from focsing?
+	gui.unfocusAllWidgets(); // maybe to prevent editbox from focusing?
 	hasStarted = true;
 	changeScene(0); // project view on startup
 
 	while (running()) { render(); }
+
+	// nothing here
 }
 
 // Events
@@ -31,41 +38,113 @@ void Engine::drawProjectViewer() {
 	gui.removeAllWidgets();
 
 	// New widgets
-	auto view_main_lin = tgui::VerticalLayout::create();
+	tgui::Theme theme("Themes/Black.txt"); // main theme for btns etc
 
-	auto view_top_lin = tgui::HorizontalLayout::create();
+	// Pseudo main bg color
+	auto view_main_group = tgui::Group::create({ "100%", "100%" });
+	view_main_group->getRenderer();
+
+	////////////////// ADD IT LATER PLS FOR GODS SAKE////////////////////////////
 
 	auto view_logo = tgui::Label::create("Dabgine");
 	view_logo->setAutoSize(false);
+	view_logo->getRenderer()->setFont(tgui::Font("Fonts/Alata-Regular.ttf"));
 	view_logo->getRenderer()->setTextColor(sf::Color::White);
+	view_logo->getRenderer()->setTextOutlineThickness(1);
+	view_logo->getRenderer()->setTextOutlineColor(tgui::Color::Black);
 	view_logo->setTextSize(25);
+	view_logo->setPosition(0, 0);
 	view_logo->setSize("100%", "35");
 	view_logo->setHorizontalAlignment(tgui::Label::HorizontalAlignment::Center);
-	view_logo->getRenderer()->setFont(tgui::Font("Fonts/Alata-Regular.ttf"));
-
-	auto view_proj_list = tgui::ListView::create();
-
-	auto view_bottom_lin = tgui::HorizontalLayout::create();
+	view_logo->setVerticalAlignment(tgui::Label::VerticalAlignment::Center);
 
 	auto view_btn_create = tgui::Button::create("Create Project");
-
-	view_top_lin->add(view_logo);
-
-	view_bottom_lin->add(view_btn_create);
-
-	view_main_lin->add(view_top_lin);
-	//view_main_lin->add(view_proj_list);
-	//view_main_lin->add(view_bottom_lin);
-
-	gui.add(view_main_lin);
+	view_btn_create->setRenderer(theme.getRenderer("Button"));
+	view_btn_create->getRenderer()->setFont(tgui::Font("Fonts/Alata-Regular.ttf"));
+	view_btn_create->getRenderer()->setTextColor(tgui::Color::White);
+	view_btn_create->getRenderer()->setTextOutlineThickness(1);
+	view_btn_create->getRenderer()->setTextOutlineColor(tgui::Color::Black);
+	view_btn_create->setTextSize(25);
+	view_btn_create->setPosition((rw->getSize().x - 250) / 2, "93%"); // TODO: Fix x to be resized in resizeEvent
+	view_btn_create->setSize(250, 40);
+	view_btn_create->connect("pressed", [=] () { } );
 	
+	// Start adding the projects to a list
+	auto view_proj_list = tgui::ListView::create();
+	view_proj_list->setAutoScroll(false);
+	view_proj_list->setPosition(10, 40);
+	view_proj_list->setSize("97%", "85%");
+	view_proj_list->getRenderer()->setBackgroundColor(tgui::Color("#18191a")); // color picker
+	view_proj_list->getRenderer()->setBackgroundColorHover(tgui::Color("#202121"));
+	view_proj_list->getRenderer()->setSelectedBackgroundColor(tgui::Color("#252626"));
+	view_proj_list->getRenderer()->setSelectedBackgroundColorHover(tgui::Color("#2f3030"));
+	view_proj_list->getRenderer()->setTextColor(tgui::Color("#76787a"));
+	view_proj_list->getRenderer()->setTextColorHover(tgui::Color("#a2a4a6"));
+	view_proj_list->getRenderer()->setSelectedTextColor(tgui::Color("#cccecf"));
+	view_proj_list->getRenderer()->setSelectedTextColorHover(tgui::Color("#d7dadb"));
+	view_proj_list->getRenderer()->setFont("Fonts/Alata-Regular.ttf");
+	view_proj_list->getRenderer()->setHeaderTextColor(tgui::Color("#78797a"));
+	view_proj_list->getRenderer()->setHeaderBackgroundColor(tgui::Color("#111112"));
+	view_proj_list->getRenderer()->setBorders({ 2, 2, 2, 2 });
+	view_proj_list->getRenderer()->setBorderColor(tgui::Color("#252729"));
+	view_proj_list->getRenderer()->setGridLinesColor(tgui::Color("#222426"));
+	view_proj_list->setTextSize(15);
+	view_proj_list->setHeaderHeight(30);
+	view_proj_list->setHeaderSeparatorHeight(1);
+	view_proj_list->setSeparatorWidth(1);
+	view_proj_list->setHeaderTextSize(20);
+	view_proj_list->setGridLinesWidth(1);
+	view_proj_list->getRenderer()->setPadding({ 0, 0, 0, 0 });
+
+	// List signals
+
+	view_proj_list->connect("RightClicked", [=] () {
+		log.log("Right clicked!"); 
+	});
+
+	view_proj_list->connect("DoubleClicked", [=] () {
+		log.log("Double clicked!");
+	});
+
+	std::ifstream proj_file_list(proj_file_path);
+
+	json j;
+
+	j = j.parse(proj_file_list);
+	
+	// List project details
+
+	// Columns
+	auto list_column_name = view_proj_list->addColumn("Project Name");
+	view_proj_list->setColumnWidth(list_column_name, 150);
+
+	auto list_column_desc = view_proj_list->addColumn("Project Description");
+	view_proj_list->setExpandLastColumn(true); // instead of trying out custom width to fill
+
+	// Iterate for values
+	for (auto element : j["projects"].items()) {
+		auto proj_name = element.value()["name"].dump(); // dump for making it usable as a string
+		proj_name.erase(std::remove(proj_name.begin(), proj_name.end(), '"'), proj_name.end()); // remove the " from the json string
+
+		auto proj_desc = element.value()["description"].dump();
+		proj_desc.erase(std::remove(proj_desc.begin(), proj_desc.end(), '"'), proj_desc.end());
+
+		// Set item names to the corresponding collumn
+		view_proj_list->addItem(std::vector<sf::String> {proj_name, proj_desc} );
+		
+	}
+
+	proj_file_list.close();
+
+	// Add first
+	gui.add(view_logo);
+	gui.add(view_proj_list);
+	gui.add(view_btn_create);
+
+	// Then animate everything
 	view_logo->showWithEffect(tgui::ShowAnimationType::Fade, sf::seconds(2));
-	
-	// replace with list from a file
-	/*for (int x = 0; x < 3; x++) {
-		view_main_lin->add(tgui::Button::create("Button " + std::to_string(x)), "btn_" + std::to_string(x));
-	}*/
-
+	view_proj_list->showWithEffect(tgui::ShowAnimationType::Fade, sf::seconds(2));
+	view_btn_create->showWithEffect(tgui::ShowAnimationType::Fade, sf::seconds(2));
 }
 
 void Engine::drawProjectEditor() {
@@ -109,12 +188,6 @@ Engine::~Engine() {
 ///// |----- PUBLIC FUNCTIONS -----| /////
 
 
-void Engine::resize(sf::VideoMode w_vm) {
-	log.log("Dabgine resizing...");
-	if (isCustomWindow) { rw->create(w_vm, w_cm_title, w_cm_style, w_cm_ctx); rw->setFramerateLimit(w_cm_fps); }
-	else { rw->create(w_vm, w_def_title); rw->setFramerateLimit(w_def_fps); }
-}
-
 void Engine::pollEvents() {
 	while (rw->pollEvent(ev)) {
 		switch (ev.type) {
@@ -125,6 +198,11 @@ void Engine::pollEvents() {
 
 		case sf::Event::KeyPressed:
 			keyPressedEvent();
+			break;
+
+		case sf::Event::Resized:
+			rw->setView(sf::View(sf::FloatRect(0.f, 0.f, static_cast<float>(ev.size.width), static_cast<float>(ev.size.height))));
+			gui.setView(rw->getView());
 			break;
 
 		}
@@ -187,6 +265,35 @@ void Engine::changeScene(int which) {
 
 		}
 	}
+}
+
+
+void Engine::checkCoreFiles() {
+	
+	// Individual checks
+
+	log.log("Working path: " + std::experimental::filesystem::current_path().string());
+	if (!fs::exists(proj_file_path)) {
+		log.log(proj_file_path + " doesnt exist, creating...");
+
+		// Open the file
+		std::ofstream proj_file(proj_file_path);
+		
+		// Create a json object
+		json j;
+
+		// Create the default project json code
+		j["projects"]["Default Game"]["name"] = "Default Game";
+		j["projects"]["Default Game"]["description"] = "The default Dabgine Game project.";
+		fs::create_directory("Default Game");
+
+		// Save to file
+		proj_file << j;
+
+		// Close the file
+		proj_file.close();
+	}
+	
 }
 
 

@@ -18,7 +18,7 @@ void startup() {
 	sf::ContextSettings ctx = sf::ContextSettings();
 	ctx.majorVersion = 2;
 	ctx.minorVersion = 0; // opengl 2
-	Engine engine(sf::VideoMode(800, 600), "Dabgine", sf::Style::Titlebar | sf::Style::Close, ctx, sf::Color::Black, 60);
+	Engine engine(sf::VideoMode(800, 600), "Dabgine", sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close, ctx, sf::Color::Black, 60);
 }
 
 // Entry function for RELEASE config.
