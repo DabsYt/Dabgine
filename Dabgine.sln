@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dabgine", "Dabgine.vcxproj", "{33FBAB1E-DDF9-4E92-9DA7-ACB79332EFA3}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Dabgine Installer", "..\Installers\Dabgine Installer\Dabgine Installer.vdproj", "{02CCEAE4-9162-4B6D-BD9E-10E786E57251}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Dabgine Debug Installer", "..\Installers\Dabgine Debug Installer\Dabgine Debug Installer.vdproj", "{053AD561-64C9-4B5C-B073-4D8C2AD33FEB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +25,16 @@ Global
 		{33FBAB1E-DDF9-4E92-9DA7-ACB79332EFA3}.Release|x64.Build.0 = Release|x64
 		{33FBAB1E-DDF9-4E92-9DA7-ACB79332EFA3}.Release|x86.ActiveCfg = Release|Win32
 		{33FBAB1E-DDF9-4E92-9DA7-ACB79332EFA3}.Release|x86.Build.0 = Release|Win32
+		{02CCEAE4-9162-4B6D-BD9E-10E786E57251}.Debug|x64.ActiveCfg = Debug
+		{02CCEAE4-9162-4B6D-BD9E-10E786E57251}.Debug|x86.ActiveCfg = Debug
+		{02CCEAE4-9162-4B6D-BD9E-10E786E57251}.Release|x64.ActiveCfg = Release
+		{02CCEAE4-9162-4B6D-BD9E-10E786E57251}.Release|x64.Build.0 = Release
+		{02CCEAE4-9162-4B6D-BD9E-10E786E57251}.Release|x86.ActiveCfg = Release
+		{053AD561-64C9-4B5C-B073-4D8C2AD33FEB}.Debug|x64.ActiveCfg = Debug
+		{053AD561-64C9-4B5C-B073-4D8C2AD33FEB}.Debug|x64.Build.0 = Debug
+		{053AD561-64C9-4B5C-B073-4D8C2AD33FEB}.Debug|x86.ActiveCfg = Debug
+		{053AD561-64C9-4B5C-B073-4D8C2AD33FEB}.Release|x64.ActiveCfg = Release
+		{053AD561-64C9-4B5C-B073-4D8C2AD33FEB}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

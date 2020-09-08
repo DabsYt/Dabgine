@@ -6,6 +6,8 @@
 
 
 #include "utils/Logging.hpp"
+#include "utils/Math.hpp"
+#include "Constants.hpp"
 
 #include "SFML/System.hpp"
 #include "SFML/Graphics.hpp"
@@ -29,9 +31,6 @@ namespace fs = std::experimental::filesystem;
 ///// |----- DEFINITIONS -----| /////
 
 
-#define MIMAX(num, min, max) (min < num && num < max)
-
-
 ///// |----- DEFINITIONS -----| /////
 
 
@@ -44,6 +43,8 @@ private:
 
 
 	Logging log;
+	
+	json j;
 
 	sf::RenderWindow* rw;
 	tgui::Gui gui;
@@ -61,6 +62,9 @@ private:
 	bool hasStarted = false; // check in render etc if window is ready
 	int max_scenes = 2; // needed for changeScene
 	std::string proj_file_path = "projects.json";
+	std::string error_str;
+	bool errorBool;
+	//bool* isErrored = false;
 
 	// CUSTOM WINDOW VARIABLES //
 
@@ -83,18 +87,15 @@ private:
 	/////////////////////////////////////////////////////////
 	void initOnce();
 
-
-	// EVENTS //
-
 	/////////////////////////////////////////////////////////
-	// \brief Clears and renders the window display.
+	// \brief Sets up the main variables.
 	/////////////////////////////////////////////////////////
-	void closedEvent();
+	void setupVars();
 
 	/////////////////////////////////////////////////////////
-	// \brief Clears and renders the window display.
+	// \brief Checks all the necessary files.
 	/////////////////////////////////////////////////////////
-	void keyPressedEvent();
+	void checkCoreFiles();
 
 	/////////////////////////////////////////////////////////
 	// \brief Draws the project viewer.
@@ -105,6 +106,41 @@ private:
 	// \brief Draws the project editor.
 	/////////////////////////////////////////////////////////
 	void drawProjectEditor();
+
+	/////////////////////////////////////////////////////////
+	// \brief Creates a new project with the desired params.
+	//
+	// @param j: The json object to update if the creation was successful.
+	// @param projName: The project's name.
+	// @param projDescription: The project's description.
+	// @param projPath: The project's path.
+	// @param logError: If an error occurs, save the error to a string.
+	//
+	// @return bool: Whether the creation was successful.
+	/////////////////////////////////////////////////////////
+	bool createProject(json j, std::string proj_name, std::string proj_description, std::string proj_path, std::string& log_error);
+
+	/////////////////////////////////////////////////////////
+	// \brief Checks if any error occured.
+	/////////////////////////////////////////////////////////
+	void checkHasErrored();
+
+	// EVENTS //
+
+	/////////////////////////////////////////////////////////
+	// \brief Called when the window is closing.
+	/////////////////////////////////////////////////////////
+	void closedEvent();
+
+	/////////////////////////////////////////////////////////
+	// \brief Called when a key is being pressed.
+	/////////////////////////////////////////////////////////
+	void keyPressedEvent();
+
+	/////////////////////////////////////////////////////////
+	// \brief Called when the window is resizing.
+	/////////////////////////////////////////////////////////
+	void resizeEvent();
 
 
 	///// |----- FUNCTIONS -----| /////
@@ -148,11 +184,6 @@ public:
 
 
 	/////////////////////////////////////////////////////////
-	// \brief Resizes the current window.
-	/////////////////////////////////////////////////////////
-	void resize(sf::VideoMode w_vm);
-
-	/////////////////////////////////////////////////////////
 	// \brief Polls all current events such as input.
 	/////////////////////////////////////////////////////////
 	void pollEvents();
@@ -189,7 +220,9 @@ public:
 	sf::Color getRenderColor();
 
 	/////////////////////////////////////////////////////////
-	// \brief Clears and renders the window display.
+	// \brief Gets the current window's video mode.
+	//
+	// @return sf::VideoMode: The window's VideoMode.
 	/////////////////////////////////////////////////////////
 	sf::VideoMode getWindowRect();
 
@@ -199,11 +232,6 @@ public:
 	// @param which: The scene's int number.
 	/////////////////////////////////////////////////////////
 	void changeScene(int which);
-
-	/////////////////////////////////////////////////////////
-	// \brief Checks all the necessary files.
-	/////////////////////////////////////////////////////////
-	void checkCoreFiles();
 
 
 	///// |----- FUNCTIONS -----| /////

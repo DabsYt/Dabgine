@@ -8,29 +8,49 @@ void Engine::initOnce() {
 	log.log("Dabgine starting...");
 	
 	// Check stuff first here (files, projects, settings etc.)
+	setupVars();
 	checkCoreFiles();
 
 	// Other
 	gui.setTarget(*rw);
-	gui.setTabKeyUsageEnabled(false); // baaad tab keys
+	gui.setTabKeyUsageEnabled(false);
 	gui.unfocusAllWidgets(); // maybe to prevent editbox from focusing?
 	hasStarted = true;
 	changeScene(0); // project view on startup
 
-	while (running()) { render(); }
+	while (running()) {
+		//checkHasErrored(); TODO
+		render(); 
+	}
 
 	// nothing here
 }
 
-// Events
-void Engine::closedEvent() {
-	log.log("Dabgine stopping...");
-	gui.removeAllWidgets();
-	rw->close();
+void Engine::setupVars() {
+	proj_file_path = fs::current_path().string() + "\\projects.json"; //change with absolute C:/Program Files/Dabs Yt/Dabgine/projects.json
+	std::ifstream proj_file(proj_file_path);
+	proj_file >> j;
+	proj_file.close();
 }
 
-void Engine::keyPressedEvent() {
-	// some cool event
+void Engine::checkCoreFiles() {
+
+	// Individual checks
+
+	log.log("Working path: " + fs::current_path().string());
+	if (!fs::exists(proj_file_path)) {
+		log.log("projects.json doesnt exist, creating together with a default project.");
+
+		// TODO: Implement a global error condition thingy to catch errors like this
+		errorBool = createProject(j, "Default Game", "The default Dabgine game project.", fs::current_path().string() + "\\Default Game", error_str); // discard return, should work anw
+		// ERROR_CONDITION(errorBool, error_str, *isErrored); // TODO
+
+		// update dict
+		std::ifstream proj_file(proj_file_path);
+		proj_file >> j;
+		proj_file.close();
+	}
+
 }
 
 void Engine::drawProjectViewer() {
@@ -44,7 +64,7 @@ void Engine::drawProjectViewer() {
 	auto view_main_group = tgui::Group::create({ "100%", "100%" });
 	view_main_group->getRenderer();
 
-	////////////////// ADD IT LATER PLS FOR GODS SAKE////////////////////////////
+	////////////////// ADD IT LATER PLS FOR GODS SAKE///////////////////////////
 
 	auto view_logo = tgui::Label::create("Dabgine");
 	view_logo->setAutoSize(false);
@@ -65,10 +85,10 @@ void Engine::drawProjectViewer() {
 	view_btn_create->getRenderer()->setTextOutlineThickness(1);
 	view_btn_create->getRenderer()->setTextOutlineColor(tgui::Color::Black);
 	view_btn_create->setTextSize(25);
-	view_btn_create->setPosition((rw->getSize().x - 250) / 2, "93%"); // TODO: Fix x to be resized in resizeEvent
-	view_btn_create->setSize(250, 40);
-	view_btn_create->connect("pressed", [=] () { } );
-	
+	view_btn_create->setPosition("35%", "93%"); // TODO: Fix x to be resized in resizeEvent
+	view_btn_create->setSize("30%", 40);
+	view_btn_create->connect("pressed", [=]() {}); // open dialog
+
 	// Start adding the projects to a list
 	auto view_proj_list = tgui::ListView::create();
 	view_proj_list->setAutoScroll(false);
@@ -97,12 +117,14 @@ void Engine::drawProjectViewer() {
 	view_proj_list->getRenderer()->setPadding({ 0, 0, 0, 0 });
 
 	// List signals
-
-	view_proj_list->connect("RightClicked", [=] () {
-		log.log("Right clicked!"); 
+	view_proj_list->connect("RightClicked", [=](int itemindex) {
+		if (MIMAX(itemindex, 0, view_proj_list->getItemCount())) {
+			// limit to current item count and create CHILDWINDOW(TODO)
+			log.log(j["projects"][view_proj_list->getItem(itemindex)]["path"]);
+		}
 	});
 
-	view_proj_list->connect("DoubleClicked", [=] () {
+	view_proj_list->connect("DoubleClicked", [=]() {
 		log.log("Double clicked!");
 	});
 
@@ -111,7 +133,7 @@ void Engine::drawProjectViewer() {
 	json j;
 
 	j = j.parse(proj_file_list);
-	
+
 	// List project details
 
 	// Columns
@@ -130,8 +152,7 @@ void Engine::drawProjectViewer() {
 		proj_desc.erase(std::remove(proj_desc.begin(), proj_desc.end(), '"'), proj_desc.end());
 
 		// Set item names to the corresponding collumn
-		view_proj_list->addItem(std::vector<sf::String> {proj_name, proj_desc} );
-		
+		view_proj_list->addItem(std::vector<sf::String> {proj_name, proj_desc});
 	}
 
 	proj_file_list.close();
@@ -148,6 +169,54 @@ void Engine::drawProjectViewer() {
 }
 
 void Engine::drawProjectEditor() {
+
+}
+
+bool Engine::createProject(json j, std::string projName, std::string projDescription, std::string projPath, std::string& logError) {
+
+	// prevent duplicate project
+	for (auto element : j["projects"].items()) {
+		if (element.value()["path"].dump() == projPath) { logError = "A project already exists at the specified path."; return false; }
+	}
+
+	// passing to create the project
+	j["projects"][projName];
+	j["projects"][projName]["name"] = projName;
+	j["projects"][projName]["description"] = projDescription;
+	j["projects"][projName]["path"] = projPath;
+
+	fs::create_directory(projPath);
+
+	std::ofstream proj_file(proj_file_path);
+
+	proj_file << j;
+
+	proj_file.close();
+
+	return true;
+}
+
+//////////////// TODO //////////////////
+/*void Engine::checkHasErrored() {
+	if (isErrored) {
+		// open dialog to show error
+		log.log(error_str);
+		isErrored = false;
+	}
+}*/
+
+// Events
+void Engine::closedEvent() {
+	log.log("Dabgine stopping...");
+	gui.removeAllWidgets();
+	rw->close();
+}
+
+void Engine::keyPressedEvent() {
+	// some cool event
+}
+
+void Engine::resizeEvent() {
 
 }
 
@@ -203,6 +272,7 @@ void Engine::pollEvents() {
 		case sf::Event::Resized:
 			rw->setView(sf::View(sf::FloatRect(0.f, 0.f, static_cast<float>(ev.size.width), static_cast<float>(ev.size.height))));
 			gui.setView(rw->getView());
+			resizeEvent();
 			break;
 
 		}
@@ -247,9 +317,9 @@ void Engine::changeScene(int which) {
 
 			log.log("Opening project viewer...");
 			
-			hasStarted = false; // delay render to draw everything first
+			//hasStarted = false; // delay render to draw everything first
 			drawProjectViewer();
-			hasStarted = true; //keep rendering
+			//hasStarted = true; //keep rendering
 
 			break;
 
@@ -265,35 +335,6 @@ void Engine::changeScene(int which) {
 
 		}
 	}
-}
-
-
-void Engine::checkCoreFiles() {
-	
-	// Individual checks
-
-	log.log("Working path: " + std::experimental::filesystem::current_path().string());
-	if (!fs::exists(proj_file_path)) {
-		log.log(proj_file_path + " doesnt exist, creating...");
-
-		// Open the file
-		std::ofstream proj_file(proj_file_path);
-		
-		// Create a json object
-		json j;
-
-		// Create the default project json code
-		j["projects"]["Default Game"]["name"] = "Default Game";
-		j["projects"]["Default Game"]["description"] = "The default Dabgine Game project.";
-		fs::create_directory("Default Game");
-
-		// Save to file
-		proj_file << j;
-
-		// Close the file
-		proj_file.close();
-	}
-	
 }
 
 

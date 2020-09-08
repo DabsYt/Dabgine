@@ -1,21 +1,34 @@
 #ifndef LOGGING_HPP
 #define LOGGING_HPP
 
+///// |----- HEADERS -----| /////
+
+
 #include <iostream>
+
+
+///// |----- HEADERS -----| /////
+
 
 class Logging {
 
 private:
 
-	// Variables
+
+	///// |----- VARIABLES -----| /////
+
 
 	bool debugMode = true; // disable / enable outputting logs and more
 
-	// Functions
+
+	///// |----- VARIABLES -----| /////
+
 
 public:
 
-	// Functions
+
+	///// |----- FUNCTIONS -----| /////
+
 
 	/////////////////////////////////////////////////////////
 	// \brief Logs a message to the console.		
@@ -38,5 +51,10 @@ public:
 	/////////////////////////////////////////////////////////
 	bool getDebug();
 
+
+	///// |----- FUNCTIONS -----| /////
+
+
 };
+
 #endif

@@ -16,12 +16,21 @@
     <ClCompile Include="core\utils\Logging.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\Constants.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Engine.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="core\utils\Logging.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\utils\Math.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Constants.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
